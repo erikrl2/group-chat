@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 import socketio.ServerSocket;
 import socketio.Socket;
 
-public class MultiEchoServerZweiClients { // TODO: zu GUI machen!
+public class ChatServer { // TODO: zu GUI machen!
 
 	private int port;
 	private ServerSocket sSocket;
 	public static List<Socket> meineSockets;
 	private List<Thread> meineThreads;
 
-	public MultiEchoServerZweiClients() throws IOException {
+	public ChatServer() throws IOException {
 		this.port = 1234;
 		this.sSocket = new ServerSocket(port);
 		meineThreads = new ArrayList<>();
@@ -25,7 +25,7 @@ public class MultiEchoServerZweiClients { // TODO: zu GUI machen!
 		System.out.println("Waiting for Clients...");
 		do {
 			var socket = sSocket.accept();
-			var t = new Thread(new KommunikationsThread(i, socket));
+			var t = new Thread(new Kommunikator(i, socket));
 			meineSockets.add(socket);
 			meineThreads.add(t);
 			t.start();
@@ -65,7 +65,7 @@ public class MultiEchoServerZweiClients { // TODO: zu GUI machen!
 
 	public static void main(String[] args) {
 		try {
-			new MultiEchoServerZweiClients();
+			new ChatServer();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -73,12 +73,12 @@ public class MultiEchoServerZweiClients { // TODO: zu GUI machen!
 
 }
 
-class KommunikationsThread implements Runnable {
+class Kommunikator implements Runnable {
 
 	private int clientnr;
 	private Socket socket;
 
-	public KommunikationsThread(int clientnr, Socket socket) {
+	public Kommunikator(int clientnr, Socket socket) {
 		this.clientnr = clientnr + 1;
 		this.socket = socket;
 	}
@@ -90,7 +90,7 @@ class KommunikationsThread implements Runnable {
 			try {
 				String msg = socket.readLine();
 				System.out.println("\nMessage from Client " + clientnr + ": " + msg);
-				MultiEchoServerZweiClients.meineSockets.forEach(e -> {
+				ChatServer.meineSockets.forEach(e -> {
 					try {
 						if (!e.equals(socket)) {
 							e.write("Client " + clientnr + " schreibt: " + msg + "\n");
@@ -109,7 +109,7 @@ class KommunikationsThread implements Runnable {
 
 	public void beenden() {
 		try {
-			MultiEchoServerZweiClients.meineSockets.remove(socket);
+			ChatServer.meineSockets.remove(socket);
 			socket.close();
 			System.out.println("\nClient " + clientnr + " has left");
 		} catch (IOException e) {

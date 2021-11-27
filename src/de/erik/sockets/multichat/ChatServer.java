@@ -116,7 +116,7 @@ class Kommunikator implements Runnable {
 		beenden();
 	}
 
-	public void beenden() {
+	private void beenden() {
 		try {
 			ChatServer.meineSockets.remove(socket);
 			socket.close();

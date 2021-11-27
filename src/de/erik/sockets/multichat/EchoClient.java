@@ -1,6 +1,10 @@
 package de.erik.sockets.multichat;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -9,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -27,6 +30,7 @@ public class EchoClient extends Application {
 	private TextField textFieldName;
 	private Thread receiver;
 	private String userName;
+	private String pathToIp;
 
 	private Parent createContent() {
 		var root = new VBox(15);
@@ -40,13 +44,13 @@ public class EchoClient extends Application {
 		btnEnd.setDisable(true);
 		btnEnd.setOnAction(e -> beenden());
 
-		textFieldIP = new TextField("localhost");
-//		textFieldIP.setText(""); // TODO: read from .txt
-		textFieldIP.setPrefWidth(75);
+		textFieldIP = new TextField("");
+		textFieldIP.setText(getSavedData(0));
+		textFieldIP.setPrefWidth(90);
 		textFieldIP.setOnAction(e -> verbinden());
 
-		textFieldName = new TextField();
-//		textFieldName.setText(""); // TODO: read from .txt
+		textFieldName = new TextField("");
+		textFieldName.setText(getSavedData(1));
 		textFieldName.setPrefWidth(75);
 		textFieldName.setPromptText("name");
 		textFieldName.setOnAction(e -> verbinden());
@@ -67,10 +71,21 @@ public class EchoClient extends Application {
 		return root;
 	}
 
+	private String getSavedData(int i) {
+		List<String> list = null;
+		try {
+			list = Files.readAllLines(Paths.get(pathToIp), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return i == 1 && list.size() == 1 ? "" : list.size() == 0 ? "fehler" : list.get(i);
+	}
+
 	private void verbinden() {
 		createSocket();
 		textArea.clear();
 		if (socket.connect()) {
+			saveData();
 			textArea.appendText("Verbindung hergestellt. Chat offen.");
 			btnCon.setDisable(true);
 			btnEnd.setDisable(false);
@@ -94,10 +109,18 @@ public class EchoClient extends Application {
 				} while (true);
 			});
 			receiver.start();
-			// TODO: IP und Name in .txt speichern
 		} else {
 			textArea.appendText(
 					"Verbindung konnte nicht hergestellt werden.\nServer offline oder Adresse nicht gültig.\n");
+		}
+	}
+
+	private void saveData() {
+		try {
+			String data = textFieldIP.getText() + "\n" + textFieldName.getText();
+			Files.write(Paths.get(pathToIp), data.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -141,11 +164,12 @@ public class EchoClient extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		pathToIp = "src/de/erik/sockets/multichat/data.txt";
 		stage.setScene(new Scene(createContent()));
-		stage.setMinWidth(360);
+		stage.setMinWidth(375);
 		stage.setMinHeight(250);
 		stage.setTitle("Group Chat");
-		stage.getIcons().add(new Image(getClass().getResource("").toExternalForm())); // TODO: add icon
+//		stage.getIcons().add(new Image(getClass().getResource("").toExternalForm())); // TODO: add icon
 		stage.setOnCloseRequest(e -> {
 			if (btnCon.isDisabled())
 				beenden();

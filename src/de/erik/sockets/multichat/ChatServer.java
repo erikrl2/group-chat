@@ -10,15 +10,13 @@ import socketio.Socket;
 
 public class ChatServer {
 
-	private int port;
 	private ServerSocket sSocket;
 	public static List<Socket> meineSockets;
 	private List<Thread> meineThreads;
 
 	public ChatServer() throws IOException {
 //		System.setProperty("fazecast.jSerialComm.appid", "YOUR_APPLICATION_IDENTIFIER");
-		this.port = 1234;
-		this.sSocket = new ServerSocket(port);
+		this.sSocket = new ServerSocket(5731);
 		meineThreads = new ArrayList<>();
 		meineSockets = new ArrayList<>();
 		var update = updateThreads();
@@ -83,22 +81,30 @@ class Kommunikator implements Runnable {
 		this.socket = socket;
 	}
 
+	private String name;
+
 	private void kommunizieren() {
-		System.out.println("\nClient " + clientnr + " has joined the server");
-		String s = "", kw = "~+*#";
+		String s = "", kw = "over", f = "";
 		do {
 			try {
 				String msg = socket.readLine();
-				if (!msg.equals(kw))
-					System.out.println("\nMessage from Client " + clientnr + ": " + msg);
-				String full = "Client " + clientnr + " -> " + msg + "\n";
+				if (!msg.equals(kw) && !msg.equals("")) {
+					name = msg.split(" -> ")[0];
+					name = name.equals("user") ? name + clientnr : name;
+					f = name + " -> " + msg.strip().split(" -> ")[1];
+					System.out.println(name + " -> " + msg.split(" -> ")[1]);
+				}
+				String c = f;
 				ChatServer.meineSockets.forEach(e -> {
-					String a = !msg.equals(kw) ? full : "Client " + clientnr + " hat den Chat verlassen\n";
-					if (!e.equals(socket)) {
-						try {
-							e.write(a);
-						} catch (IOException ex) {
-							ex.printStackTrace();
+					String a = "";
+					if (!msg.equals("")) {
+						a = !msg.equals(kw) ? c : name + " hat den Chat verlassen";
+						if (!e.equals(socket)) {
+							try {
+								e.write(a + "\n");
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					}
 				});
@@ -114,7 +120,7 @@ class Kommunikator implements Runnable {
 		try {
 			ChatServer.meineSockets.remove(socket);
 			socket.close();
-			System.out.println("Client " + clientnr + " has left");
+			System.out.println(name + " hat den Chat verlassen");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -13,13 +13,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import socketio.Socket;
 
-public class EchoClient extends Application {
+public class Client extends Application {
 
 	private Socket socket;
 	private TextArea textArea;
@@ -36,6 +39,7 @@ public class EchoClient extends Application {
 		var root = new VBox(15);
 		root.setPrefSize(400, 400);
 		root.setPadding(new Insets(10));
+		root.setBackground(new Background(new BackgroundFill(Color.LIGHTSLATEGRAY, null, null)));
 
 		btnCon = new Button("verbinden");
 		btnCon.setOnAction(e -> verbinden());
@@ -47,13 +51,13 @@ public class EchoClient extends Application {
 		textFieldIP = new TextField("");
 		textFieldIP.setText(getSavedData(0));
 		textFieldIP.setPrefWidth(90);
-		textFieldIP.setOnAction(e -> verbinden());
+//		textFieldIP.setOnAction(e -> verbinden());
 
 		textFieldName = new TextField("");
 		textFieldName.setText(getSavedData(1));
 		textFieldName.setPrefWidth(75);
 		textFieldName.setPromptText("name");
-		textFieldName.setOnAction(e -> verbinden());
+//		textFieldName.setOnAction(e -> verbinden());
 
 		textArea = new TextArea();
 		textArea.setPrefHeight(999);

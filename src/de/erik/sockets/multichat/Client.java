@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -39,7 +40,7 @@ public class Client extends Application {
 		var root = new VBox(15);
 		root.setPrefSize(400, 400);
 		root.setPadding(new Insets(10));
-		root.setBackground(new Background(new BackgroundFill(Color.LIGHTSLATEGRAY, null, null)));
+		root.setBackground(new Background(new BackgroundFill(Color.SKYBLUE, null, null)));
 
 		btnCon = new Button("verbinden");
 		btnCon.setOnAction(e -> verbinden());
@@ -98,7 +99,7 @@ public class Client extends Application {
 			textFieldName.setEditable(false);
 			userName = textFieldName.getText().equals("") ? "user" : textFieldName.getText();
 			try {
-				socket.write("\n" + userName + " -> [ist beigetreten]\n");
+				socket.write("\n" + replaceUmlaute(userName) + " -> [ist beigetreten]\n");
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -122,7 +123,7 @@ public class Client extends Application {
 	private void saveData() {
 		try {
 			String data = textFieldIP.getText() + "\n" + textFieldName.getText();
-			Files.write(Paths.get(pathToIp), data.getBytes());
+			Files.write(Paths.get(pathToIp), replaceUmlaute(data).getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -140,13 +141,16 @@ public class Client extends Application {
 		String msg = textFieldMsg.getText();
 		textFieldMsg.clear();
 		String full = "\n" + userName + " -> " + msg;
-		// TODO: umlaute in ae,ue,oe umwandeln
 		try {
-			socket.write(full + "\n");
+			socket.write(replaceUmlaute(full) + "\n");
 			textArea.appendText("\nDu -> " + msg);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String replaceUmlaute(String s) {
+		return s.replaceAll("ä", "ae").replaceAll("ü", "ue").replaceAll("ö", "oe");
 	}
 
 	@SuppressWarnings("deprecation")
@@ -173,7 +177,7 @@ public class Client extends Application {
 		stage.setMinWidth(375);
 		stage.setMinHeight(250);
 		stage.setTitle("Group Chat");
-//		stage.getIcons().add(new Image(getClass().getResource("").toExternalForm())); // TODO: add icon
+		stage.getIcons().add(new Image(getClass().getResource("chat.png").toExternalForm()));
 		stage.setOnCloseRequest(e -> {
 			if (btnCon.isDisabled())
 				beenden();

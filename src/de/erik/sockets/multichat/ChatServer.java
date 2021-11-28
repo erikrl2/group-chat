@@ -15,7 +15,6 @@ public class ChatServer {
 	private List<Thread> meineThreads;
 
 	public ChatServer() throws IOException {
-//		System.setProperty("fazecast.jSerialComm.appid", "YOUR_APPLICATION_IDENTIFIER");
 		this.sSocket = new ServerSocket(5731);
 		meineThreads = new ArrayList<>();
 		meineSockets = new ArrayList<>();

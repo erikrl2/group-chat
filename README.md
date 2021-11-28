@@ -1,4 +1,4 @@
-# group-chat
+# Group Chat
 
 Group Chat GUI to chat within local area networks.
 

@@ -1,12 +1,13 @@
-package de.erik.sockets.multichat;
+package de.erik.chat;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import socketio.ServerSocket;
-import socketio.Socket;
+import de.erik.socketio.ServerSocket;
+import de.erik.socketio.Socket;
 
 public class ChatServer {
 

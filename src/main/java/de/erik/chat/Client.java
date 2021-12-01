@@ -1,4 +1,4 @@
-package de.erik.sockets.multichat;
+package de.erik.chat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import de.erik.socketio.Socket;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -21,7 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import socketio.Socket;
 
 public class Client extends Application {
 
@@ -52,13 +52,11 @@ public class Client extends Application {
 		textFieldIP = new TextField("");
 		textFieldIP.setText(getSavedData(0));
 		textFieldIP.setPrefWidth(90);
-//		textFieldIP.setOnAction(e -> verbinden());
 
 		textFieldName = new TextField("");
 		textFieldName.setText(getSavedData(1));
 		textFieldName.setPrefWidth(75);
 		textFieldName.setPromptText("name");
-//		textFieldName.setOnAction(e -> verbinden());
 
 		textArea = new TextArea();
 		textArea.setPrefHeight(999);
@@ -172,12 +170,13 @@ public class Client extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		pathToIp = "src/de/erik/sockets/multichat/data.txt";
+		String s = System.getProperty("user.dir");
+		pathToIp = s + "/data.txt";
 		stage.setScene(new Scene(createContent()));
 		stage.setMinWidth(375);
 		stage.setMinHeight(250);
 		stage.setTitle("Group Chat");
-		stage.getIcons().add(new Image(getClass().getResource("chat.png").toExternalForm()));
+		stage.getIcons().add(new Image(Client.class.getResource("chat.png").toString()));
 		stage.setOnCloseRequest(e -> {
 			if (btnCon.isDisabled())
 				beenden();

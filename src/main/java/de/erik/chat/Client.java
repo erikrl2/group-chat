@@ -1,6 +1,7 @@
 package de.erik.chat;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -27,7 +29,7 @@ public class Client extends Application {
 
 	private Socket socket;
 	private TextArea textArea;
-	private TextField textFieldMsg;
+	private TextArea messageField;
 	private TextField textFieldIP;
 	private Button btnCon;
 	private Button btnEnd;
@@ -43,34 +45,47 @@ public class Client extends Application {
 		root.setBackground(new Background(new BackgroundFill(Color.SKYBLUE, null, null)));
 
 		btnCon = new Button("verbinden");
+		btnCon.setFont(Font.font(14));
 		btnCon.setOnAction(e -> verbinden());
 
 		btnEnd = new Button("trennen");
 		btnEnd.setDisable(true);
+		btnEnd.setFont(Font.font(14));
 		btnEnd.setOnAction(e -> beenden());
 
 		textFieldIP = new TextField("");
 		textFieldIP.setText(getSavedData(0));
 		textFieldIP.setPrefWidth(90);
+		textFieldIP.setFont(Font.font(14));
 
 		textFieldName = new TextField("");
 		textFieldName.setText(getSavedData(1));
 		textFieldName.setPrefWidth(75);
 		textFieldName.setPromptText("name");
+		textFieldName.setFont(Font.font(14));
 
 		textArea = new TextArea();
 		textArea.setPrefHeight(999);
 		textArea.setEditable(false);
-		textArea.setFont(Font.font(14));
+		textArea.setWrapText(true);
+		textArea.setFont(Font.font(15));
 		textArea.setPromptText("disconneted");
 
-		textFieldMsg = new TextField();
-		textFieldMsg.setEditable(false);
-		textFieldMsg.setFont(Font.font(14));
-		textFieldMsg.setPromptText("enter message");
-		textFieldMsg.setOnAction(e -> send());
+		messageField = new TextArea();
+		messageField.setEditable(false);
+		messageField.setWrapText(true);
+		messageField.setMinHeight(75);
+		messageField.setFont(Font.font(15));
+		messageField.setPromptText("enter message");
+		messageField.setOnKeyPressed(e -> {
+			if (e.getCode() == KeyCode.ENTER) {
+				messageField.setText(messageField.getText().strip());
+				if (!messageField.getText().equals("") && btnCon.isDisabled())
+					send();
+			}
+		});
 
-		root.getChildren().addAll(new HBox(15, btnCon, btnEnd, textFieldIP, textFieldName), textArea, textFieldMsg);
+		root.getChildren().addAll(new HBox(15, btnCon, btnEnd, textFieldIP, textFieldName), textArea, messageField);
 		return root;
 	}
 
@@ -92,7 +107,7 @@ public class Client extends Application {
 			textArea.appendText("Verbindung hergestellt. Chat offen.");
 			btnCon.setDisable(true);
 			btnEnd.setDisable(false);
-			textFieldMsg.setEditable(true);
+			messageField.setEditable(true);
 			textFieldIP.setEditable(false);
 			textFieldName.setEditable(false);
 			userName = textFieldName.getText().equals("") ? "user" : textFieldName.getText();
@@ -136,8 +151,8 @@ public class Client extends Application {
 	}
 
 	private void send() {
-		String msg = textFieldMsg.getText();
-		textFieldMsg.clear();
+		String msg = messageField.getText();
+		messageField.clear();
 		String full = "\n" + userName + " -> " + msg;
 		try {
 			socket.write(replaceUmlaute(full) + "\n");
@@ -162,7 +177,8 @@ public class Client extends Application {
 		}
 		btnCon.setDisable(false);
 		btnEnd.setDisable(true);
-		textFieldMsg.setEditable(false);
+		messageField.setEditable(false);
+		messageField.clear();
 		textFieldIP.setEditable(true);
 		textFieldName.setEditable(true);
 		textArea.appendText("\n\nDu hast den Chat verlassen.\n");
@@ -176,12 +192,20 @@ public class Client extends Application {
 		stage.setMinWidth(375);
 		stage.setMinHeight(250);
 		stage.setTitle("Group Chat");
-		stage.getIcons().add(new Image(Client.class.getResource("chat.png").toString()));
+		stage.getIcons().add(new Image(accessFile()));
 		stage.setOnCloseRequest(e -> {
 			if (btnCon.isDisabled())
 				beenden();
 		});
 		stage.show();
+	}
+
+	public InputStream accessFile() {
+		var input = getClass().getResourceAsStream("/resources/icons/chat.png");
+		if (input == null) {
+			input = getClass().getResourceAsStream("/icons/chat.png");
+		}
+		return input;
 	}
 
 	public static void main(String[] args) {

@@ -40,8 +40,6 @@ public class ChatServer {
 			do {
 				try {
 					meineThreads = meineThreads.stream().filter(t -> t.isAlive()).collect(Collectors.toList());
-//					if (meineThreads.isEmpty())
-//						beenden(); // shut down server if all sockets closed
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -92,7 +90,7 @@ class Kommunikator implements Runnable {
 					name = msg.split(" -> ")[0];
 					name = name.equals("user") ? name + clientnr : name;
 					f = name + " -> " + msg.strip().split(" -> ")[1];
-					System.out.println(name + " -> " + msg.split(" -> ")[1]);
+					System.out.println(name + " -> " + msg.split(" -> ")[1] + "\n");
 				}
 				String c = f;
 				ChatServer.meineSockets.forEach(e -> {

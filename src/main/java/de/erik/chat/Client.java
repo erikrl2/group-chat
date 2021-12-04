@@ -55,7 +55,7 @@ public class Client extends Application {
 
 		textFieldIP = new TextField("");
 		textFieldIP.setText(getSavedData(0));
-		textFieldIP.setPrefWidth(90);
+		textFieldIP.setPrefWidth(105);
 		textFieldIP.setFont(Font.font(14));
 
 		textFieldName = new TextField("");
@@ -100,8 +100,8 @@ public class Client extends Application {
 	}
 
 	private void verbinden() {
-		createSocket();
 		textArea.clear();
+		createSocket();
 		if (socket.connect()) {
 			saveData();
 			textArea.appendText("Verbindung hergestellt. Chat offen.");
@@ -192,7 +192,7 @@ public class Client extends Application {
 		stage.setMinWidth(375);
 		stage.setMinHeight(250);
 		stage.setTitle("Group Chat");
-		stage.getIcons().add(new Image(accessFile()));
+		stage.getIcons().add(new Image(getResource("icons/chat.png")));
 		stage.setOnCloseRequest(e -> {
 			if (btnCon.isDisabled())
 				beenden();
@@ -200,10 +200,10 @@ public class Client extends Application {
 		stage.show();
 	}
 
-	public InputStream accessFile() {
-		var input = getClass().getResourceAsStream("/resources/icons/chat.png");
+	private InputStream getResource(String s) {
+		var input = getClass().getResourceAsStream("/resources/" + s);
 		if (input == null) {
-			input = getClass().getResourceAsStream("/icons/chat.png");
+			input = getClass().getResourceAsStream("/" + s);
 		}
 		return input;
 	}

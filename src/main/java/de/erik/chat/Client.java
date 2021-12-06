@@ -45,11 +45,13 @@ public class Client extends Application {
 		root.setBackground(new Background(new BackgroundFill(Color.SKYBLUE, null, null)));
 
 		btnCon = new Button("verbinden");
+		btnCon.setMinWidth(81);
 		btnCon.setFont(Font.font(14));
 		btnCon.setOnAction(e -> verbinden());
 
 		btnEnd = new Button("trennen");
 		btnEnd.setDisable(true);
+		btnEnd.setMinWidth(68);
 		btnEnd.setFont(Font.font(14));
 		btnEnd.setOnAction(e -> beenden());
 
@@ -60,6 +62,7 @@ public class Client extends Application {
 
 		textFieldName = new TextField("");
 		textFieldName.setText(getSavedData(1));
+		textFieldName.setMinWidth(65);
 		textFieldName.setPrefWidth(75);
 		textFieldName.setPromptText("name");
 		textFieldName.setFont(Font.font(14));
@@ -189,8 +192,8 @@ public class Client extends Application {
 		String s = System.getProperty("user.dir");
 		pathToIp = s + "/data.txt";
 		stage.setScene(new Scene(createContent()));
-		stage.setMinWidth(375);
-		stage.setMinHeight(250);
+		stage.setMinWidth(350);
+		stage.setMinHeight(350);
 		stage.setTitle("Group Chat");
 		stage.getIcons().add(new Image(getResource("icons/chat.png")));
 		stage.setOnCloseRequest(e -> {
